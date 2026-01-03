@@ -1,116 +1,290 @@
-import React, { useState, useEffect } from 'react';
-import { Menu } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matematyczne Zabawy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-const MathGame = () => {
-  const [mathExpressions, setMathExpressions] = useState([]);
-  const [gameStarted, setGameStarted] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
 
-  // Generowanie losowych działań matematycznych
-  useEffect(() => {
-    const operations = ['+', '-', '×', '÷'];
-    const expressions = [];
-    
-    for (let i = 0; i < 30; i++) {
-      const num1 = Math.floor(Math.random() * 20) + 1;
-      const num2 = Math.floor(Math.random() * 20) + 1;
-      const op = operations[Math.floor(Math.random() * operations.length)];
-      
-      expressions.push({
-        id: i,
-        text: `${num1} ${op} ${num2}`,
-        top: Math.random() * 85 + 5, // 5-90% wysokości
-        left: Math.random() * 4 < 1 ? Math.random() * 15 : 85 + Math.random() * 15, // lewo lub prawo
-        rotation: Math.random() * 40 - 20 // -20 do 20 stopni
-      });
-    }
-    
-    setMathExpressions(expressions);
-  }, []);
+        #game-container {
+            width: 100%;
+            height: 100vh;
+            background-color: #f97316;
+            position: relative;
+            overflow: hidden;
+        }
 
-  const startGame = () => {
-    setGameStarted(true);
-  };
+        .border-frame {
+            position: absolute;
+            inset: 0;
+            border: 80px solid #2563eb;
+            pointer-events: none;
+            z-index: 1;
+        }
 
-  if (gameStarted) {
-    return (
-      <div className="w-full h-screen bg-orange-500 flex items-center justify-center">
-        <div className="text-4xl text-blue-600 font-bold">
-          Gra zostanie wkrótce uruchomiona...
-        </div>
-      </div>
-    );
-  }
+        .math-expression {
+            position: absolute;
+            color: #f97316;
+            font-weight: bold;
+            font-size: 24px;
+            user-select: none;
+            pointer-events: none;
+        }
 
-  return (
-    <div className="w-full h-screen bg-orange-500 relative overflow-hidden">
-      {/* Niebieska ramka */}
-      <div className="absolute inset-0 border-[80px] border-blue-600 pointer-events-none">
-        {/* Działania matematyczne w ramce */}
-        {mathExpressions.map((expr) => (
-          <div
-            key={expr.id}
-            className="absolute text-orange-500 font-bold text-2xl select-none"
-            style={{
-              top: `${expr.top}%`,
-              left: `${expr.left}%`,
-              transform: `rotate(${expr.rotation}deg)`,
-            }}
-          >
-            {expr.text}
-          </div>
-        ))}
-      </div>
+        .menu-btn {
+            position: absolute;
+            top: 32px;
+            left: 32px;
+            background-color: #2563eb;
+            padding: 16px;
+            border-radius: 8px;
+            z-index: 20;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s;
+        }
 
-      {/* Przycisk menu */}
-      <button
-        onClick={() => setMenuOpen(!menuOpen)}
-        className="absolute top-8 left-8 bg-blue-600 hover:bg-blue-700 p-4 rounded-lg z-20 transition-colors"
-      >
-        <Menu className="w-8 h-8 text-white" strokeWidth={3} />
-      </button>
+        .menu-btn:hover {
+            background-color: #1d4ed8;
+        }
 
-      {/* Menu boczne */}
-      {menuOpen && (
-        <div className="absolute top-0 left-0 w-80 h-full bg-blue-600 z-10 p-8 shadow-2xl">
-          <h2 className="text-white text-3xl font-bold mb-6">Menu</h2>
-          <div className="space-y-4">
-            <button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-              Instrukcje
-            </button>
-            <button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-              Poziomy trudności
-            </button>
-            <button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-              Ustawienia
-            </button>
-            <button 
-              onClick={() => setMenuOpen(false)}
-              className="w-full bg-white hover:bg-gray-100 text-blue-600 font-bold py-3 px-6 rounded-lg transition-colors mt-8"
-            >
-              Zamknij
-            </button>
-          </div>
-        </div>
-      )}
+        .menu-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
 
-      {/* Główna zawartość */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full">
-        {/* Tytuł */}
-        <h1 className="text-7xl font-bold text-blue-600 mb-16 tracking-wide">
-          MATEMATYCZNE ZABAWY
-        </h1>
+        .menu-icon span {
+            display: block;
+            width: 100%;
+            height: 4px;
+            background-color: white;
+            border-radius: 2px;
+        }
 
-        {/* Przycisk rozpocznij */}
-        <button
-          onClick={startGame}
-          className="bg-green-500 hover:bg-green-600 text-white font-bold text-3xl py-6 px-16 rounded-2xl shadow-2xl transition-all transform hover:scale-105"
-        >
-          Rozpocznij
+        .side-menu {
+            position: absolute;
+            top: 0;
+            left: -320px;
+            width: 320px;
+            height: 100%;
+            background-color: #2563eb;
+            z-index: 15;
+            padding: 32px;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+            transition: left 0.3s ease;
+        }
+
+        .side-menu.open {
+            left: 0;
+        }
+
+        .side-menu h2 {
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 24px;
+        }
+
+        .menu-options {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .menu-option {
+            width: 100%;
+            background-color: #f97316;
+            color: white;
+            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .menu-option:hover {
+            background-color: #ea580c;
+        }
+
+        .menu-close {
+            background-color: white;
+            color: #2563eb;
+            margin-top: 32px;
+        }
+
+        .menu-close:hover {
+            background-color: #f3f4f6;
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .game-title {
+            font-size: 72px;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 64px;
+            letter-spacing: 2px;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .start-btn {
+            background-color: #22c55e;
+            color: white;
+            font-weight: bold;
+            font-size: 32px;
+            padding: 24px 64px;
+            border-radius: 16px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .start-btn:hover {
+            background-color: #16a34a;
+            transform: scale(1.05);
+        }
+
+        .game-screen {
+            display: none;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .border-frame {
+                border-width: 40px;
+            }
+
+            .game-title {
+                font-size: 36px;
+            }
+
+            .start-btn {
+                font-size: 24px;
+                padding: 16px 48px;
+            }
+
+            .math-expression {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <!-- Niebieska ramka -->
+        <div class="border-frame" id="border-frame"></div>
+
+        <!-- Przycisk menu -->
+        <button class="menu-btn" onclick="toggleMenu()">
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </button>
-      </div>
-    </div>
-  );
-};
 
-export default MathGame;
+        <!-- Menu boczne -->
+        <div class="side-menu" id="side-menu">
+            <h2>Menu</h2>
+            <div class="menu-options">
+                <button class="menu-option">Instrukcje</button>
+                <button class="menu-option">Poziomy trudności</button>
+                <button class="menu-option">Ustawienia</button>
+                <button class="menu-option menu-close" onclick="toggleMenu()">Zamknij</button>
+            </div>
+        </div>
+
+        <!-- Główna zawartość -->
+        <div class="main-content" id="main-content">
+            <h1 class="game-title">MATEMATYCZNE ZABAWY</h1>
+            <button class="start-btn" onclick="startGame()">Rozpocznij</button>
+        </div>
+
+        <!-- Ekran gry -->
+        <div class="game-screen" id="game-screen">
+            Gra zostanie wkrótce uruchomiona...
+        </div>
+    </div>
+
+    <script>
+        // Generowanie losowych działań matematycznych w ramce
+        function generateMathExpressions() {
+            const operations = ['+', '-', '×', '÷'];
+            const borderFrame = document.getElementById('border-frame');
+            
+            for (let i = 0; i < 30; i++) {
+                const num1 = Math.floor(Math.random() * 20) + 1;
+                const num2 = Math.floor(Math.random() * 20) + 1;
+                const op = operations[Math.floor(Math.random() * operations.length)];
+                
+                const expression = document.createElement('div');
+                expression.className = 'math-expression';
+                expression.textContent = `${num1} ${op} ${num2}`;
+                
+                // Losowa pozycja (lewo lub prawo)
+                const top = Math.random() * 85 + 5;
+                const left = Math.random() < 0.5 
+                    ? Math.random() * 15 
+                    : 85 + Math.random() * 15;
+                const rotation = Math.random() * 40 - 20;
+                
+                expression.style.top = `${top}%`;
+                expression.style.left = `${left}%`;
+                expression.style.transform = `rotate(${rotation}deg)`;
+                
+                borderFrame.appendChild(expression);
+            }
+        }
+
+        // Toggle menu
+        function toggleMenu() {
+            const menu = document.getElementById('side-menu');
+            menu.classList.toggle('open');
+        }
+
+        // Start game
+        function startGame() {
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+        }
+
+        // Inicjalizacja
+        window.onload = function() {
+            generateMathExpressions();
+        };
+    </script>
+</body>
+</html>

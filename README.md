@@ -1,2 +1,2 @@
-# matematycznezabaway
+# matematycznezabawy
 Zabawy z matematyką

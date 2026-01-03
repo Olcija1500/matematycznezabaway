@@ -41,6 +41,7 @@
             font-size: 24px;
             user-select: none;
             pointer-events: none;
+            z-index: 2;
         }
 
         .menu-btn {
@@ -50,7 +51,7 @@
             background-color: #2563eb;
             padding: 16px;
             border-radius: 8px;
-            z-index: 20;
+            z-index: 25;
             cursor: pointer;
             border: none;
             transition: background-color 0.3s;
@@ -83,7 +84,7 @@
             width: 320px;
             height: 100%;
             background-color: #2563eb;
-            z-index: 15;
+            z-index: 20;
             padding: 32px;
             box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
             transition: left 0.3s ease;
@@ -148,6 +149,7 @@
             font-weight: bold;
             color: #2563eb;
             margin-bottom: 64px;
+            margin-top: -80px;
             letter-spacing: 2px;
             text-align: center;
             padding: 0 20px;
@@ -245,7 +247,7 @@
             const operations = ['+', '-', '×', '÷'];
             const borderFrame = document.getElementById('border-frame');
             
-            for (let i = 0; i < 30; i++) {
+            for (let i = 0; i < 40; i++) {
                 const num1 = Math.floor(Math.random() * 20) + 1;
                 const num2 = Math.floor(Math.random() * 20) + 1;
                 const op = operations[Math.floor(Math.random() * operations.length)];
@@ -254,11 +256,28 @@
                 expression.className = 'math-expression';
                 expression.textContent = `${num1} ${op} ${num2}`;
                 
-                // Losowa pozycja (lewo lub prawo)
-                const top = Math.random() * 85 + 5;
-                const left = Math.random() < 0.5 
-                    ? Math.random() * 15 
-                    : 85 + Math.random() * 15;
+                // Losowa pozycja - głównie na górze, dole, lewo i prawo ramki
+                let top, left;
+                const position = Math.random();
+                
+                if (position < 0.25) {
+                    // Góra
+                    top = Math.random() * 15 + 2;
+                    left = Math.random() * 80 + 10;
+                } else if (position < 0.5) {
+                    // Dół
+                    top = Math.random() * 15 + 83;
+                    left = Math.random() * 80 + 10;
+                } else if (position < 0.75) {
+                    // Lewo
+                    top = Math.random() * 80 + 10;
+                    left = Math.random() * 12 + 2;
+                } else {
+                    // Prawo
+                    top = Math.random() * 80 + 10;
+                    left = Math.random() * 12 + 86;
+                }
+                
                 const rotation = Math.random() * 40 - 20;
                 
                 expression.style.top = `${top}%`;

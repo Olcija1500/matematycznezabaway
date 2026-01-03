@@ -246,15 +246,31 @@
         function generateMathExpressions() {
             const operations = ['+', '-', '×', '÷'];
             const container = document.getElementById('game-container');
+            const positions = [];
+            const minDistance = 8; // Minimalna odległość między działaniami (w %)
             
-            for (let i = 0; i < 40; i++) {
+            function isTooClose(newTop, newLeft) {
+                for (let i = 0; i < positions.length; i++) {
+                    const dist = Math.sqrt(
+                        Math.pow(newTop - positions[i].top, 2) + 
+                        Math.pow(newLeft - positions[i].left, 2)
+                    );
+                    if (dist < minDistance) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            let attempts = 0;
+            let created = 0;
+            
+            while (created < 40 && attempts < 500) {
+                attempts++;
+                
                 const num1 = Math.floor(Math.random() * 20) + 1;
                 const num2 = Math.floor(Math.random() * 20) + 1;
                 const op = operations[Math.floor(Math.random() * operations.length)];
-                
-                const expression = document.createElement('div');
-                expression.className = 'math-expression';
-                expression.textContent = num1 + ' ' + op + ' ' + num2;
                 
                 // Losowa pozycja - głównie na górze, dole, lewo i prawo ramki
                 let top, left;
@@ -262,29 +278,39 @@
                 
                 if (position < 0.25) {
                     // Góra - w obrębie górnej ramki (0-80px to 0-8vh)
-                    top = Math.random() * 6 + 1;
+                    top = Math.random() * 5 + 1.5;
                     left = Math.random() * 80 + 10;
                 } else if (position < 0.5) {
                     // Dół - w obrębie dolnej ramki
-                    top = Math.random() * 6 + 92;
+                    top = Math.random() * 5 + 92.5;
                     left = Math.random() * 80 + 10;
                 } else if (position < 0.75) {
                     // Lewo - w obrębie lewej ramki
                     top = Math.random() * 80 + 10;
-                    left = Math.random() * 6 + 1;
+                    left = Math.random() * 5 + 1.5;
                 } else {
                     // Prawo - w obrębie prawej ramki
                     top = Math.random() * 80 + 10;
-                    left = Math.random() * 6 + 92;
+                    left = Math.random() * 5 + 92.5;
                 }
                 
-                const rotation = Math.random() * 40 - 20;
-                
-                expression.style.top = top + '%';
-                expression.style.left = left + '%';
-                expression.style.transform = 'rotate(' + rotation + 'deg)';
-                
-                container.appendChild(expression);
+                // Sprawdź, czy pozycja nie jest za blisko innych działań
+                if (!isTooClose(top, left)) {
+                    positions.push({top: top, left: left});
+                    
+                    const expression = document.createElement('div');
+                    expression.className = 'math-expression';
+                    expression.textContent = num1 + ' ' + op + ' ' + num2;
+                    
+                    const rotation = Math.random() * 40 - 20;
+                    
+                    expression.style.top = top + '%';
+                    expression.style.left = left + '%';
+                    expression.style.transform = 'rotate(' + rotation + 'deg)';
+                    
+                    container.appendChild(expression);
+                    created++;
+                }
             }
         }
 

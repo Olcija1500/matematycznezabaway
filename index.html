@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matematyczna Przygoda</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+        }
+        h1 {
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+        .game-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        .problem {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 20px;
+            font-size: 1.5em;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .next-btn {
+            background: #2196F3;
+            font-size: 1.2em;
+            padding: 15px 30px;
+            margin-top: 20px;
+        }
+        .next-btn:hover {
+            background: #1976D2;
+        }
+        .restart-btn {
+            background: #FF9800;
+            font-size: 1.2em;
+            padding: 15px 30px;
+        }
+        .restart-btn:hover {
+            background: #F57C00;
+        }
+        .score {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+        .feedback {
+            font-size: 2em;
+            margin: 20px 0;
+            min-height: 60px;
+        }
+        .correct { color: #4CAF50; }
+        .wrong { color: #f44336; }
+        .game-over {
+            font-size: 2em;
+            color: #FFD700;
+        }
+        @media (max-width: 600px) {
+            .problem { font-size: 2.5em; }
+            button { font-size: 1.2em; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🧮 Matematyczna Przygoda</h1>
+        <div class="score">Punkty: <span id="score">0</span> / <span id="total">0</span></div>
+        <div class="problem" id="problem">Gotowy?</div>
+        <div class="feedback" id="feedback"></div>
+        <div class="options" id="options"></div>
+        <button class="next-btn" id="nextBtn" style="display:none;" onclick="nextProblem()">Następne zadanie</button>
+        <button class="restart-btn" id="restartBtn" style="display:none;" onclick="restartGame()">Nowa gra</button>
+    </div>
+
+    <script>
+        let currentA, currentB, correctAnswer, score = 0, total = 0;
+        const maxQuestions = 10;
+
+        function generateProblem() {
+            const isAdd = Math.random() > 0.5;
+            currentA = Math.floor(Math.random() * 20) + 1;
+            currentB = Math.floor(Math.random() * 20) + 1;
+            if (!isAdd) {
+                // Dla odejmowania upewnij się, że A >= B
+                if (currentA < currentB) [currentA, currentB] = [currentB, currentA];
+            }
+            correctAnswer = isAdd ? currentA + currentB : currentA - currentB;
+            document.getElementById('problem').textContent = `\( {currentA} \){isAdd ? '+' : '-'} ${currentB} = ?`;
+        }
+
+        function generateOptions() {
+            const options = [correctAnswer];
+            while (options.length < 4) {
+                const wrong = correctAnswer + (Math.random() * 10 - 5);
+                if (wrong > 0 && !options.includes(wrong)) {
+                    options.push(wrong);
+                }
+            }
+            options.sort(() => Math.random() - 0.5); // Tasuj
+            const container = document.getElementById('options');
+            container.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.textContent = opt;
+                btn.onclick = () => checkAnswer(opt);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected) {
+            const feedback = document.getElementById('feedback');
+            const buttons = document.querySelectorAll('.options button');
+            buttons.forEach(b => b.disabled = true);
+
+            if (selected === correctAnswer) {
+                feedback.textContent = '✅ Poprawnie!';
+                feedback.className = 'feedback correct';
+                score++;
+            } else {
+                feedback.textContent = `❌ Błąd! Poprawna odpowiedź: ${correctAnswer}`;
+                feedback.className = 'feedback wrong';
+            }
+
+            total++;
+            document.getElementById('score').textContent = score;
+            document.getElementById('total').textContent = total;
+
+            document.getElementById('nextBtn').style.display = 'block';
+
+            if (total >= maxQuestions) {
+                gameOver();
+            }
+        }
+
+        function nextProblem() {
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            generateProblem();
+            generateOptions();
+        }
+
+        function gameOver() {
+            document.getElementById('options').innerHTML = '';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('feedback').innerHTML = `<div class="game-over">🎉 Koniec gry!<br>Wynik: \( {score}/ \){maxQuestions} (${Math.round((score/maxQuestions)*100)}%)</div>`;
+            document.getElementById('restartBtn').style.display = 'block';
+        }
+
+        function restartGame() {
+            score = 0;
+            total = 0;
+            document.getElementById('score').textContent = '0';
+            document.getElementById('total').textContent = '0';
+            document.getElementById('restartBtn').style.display = 'none';
+            document.getElementById('feedback').textContent = '';
+            generateProblem();
+            generateOptions();
+        }
+
+        // Start gry
+        generateProblem();
+        generateOptions();
+    </script>
+</body>
+</html>

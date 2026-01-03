@@ -254,7 +254,7 @@
                 
                 const expression = document.createElement('div');
                 expression.className = 'math-expression';
-                expression.textContent = `${num1} ${op} ${num2}`;
+                expression.textContent = num1 + ' ' + op + ' ' + num2;
                 
                 // Losowa pozycja - głównie na górze, dole, lewo i prawo ramki
                 let top, left;
@@ -280,9 +280,9 @@
                 
                 const rotation = Math.random() * 40 - 20;
                 
-                expression.style.top = `${top}%`;
-                expression.style.left = `${left}%`;
-                expression.style.transform = `rotate(${rotation}deg)`;
+                expression.style.top = top + '%';
+                expression.style.left = left + '%';
+                expression.style.transform = 'rotate(' + rotation + 'deg)';
                 
                 borderFrame.appendChild(expression);
             }

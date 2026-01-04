@@ -1,3 +1,6 @@
+Oto pełny kod strony:
+
+```html
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -387,7 +390,7 @@
                     <p>2. Rozwiąż działania matematyczne</p>
                     <p>3. Wybierz poprawną odpowiedź</p>
                     <p>4. Zdobywaj punkty!</p>
-                    <p style="margin-top: 12px;">Masz 60 sekund na 10 pytań!</p>
+                    <p style="margin-top: 12px;">Masz 60 sekund na 7 pytań!</p>
                 </div>
             </div>
             <div id="difficulty-content" style="display: none; margin-top: 20px;">
@@ -435,14 +438,14 @@
         let score = 0;
         let timeLeft = 60;
         let currentQuestion = 0;
-        let totalQuestions = 10;
+        let totalQuestions = 7;
         let correctAnswer = 0;
         let timerInterval;
         let difficulty = 'hard';
 
         const difficultySettings = {
             easy: { max: 10, operations: ['+', '-'] },
-            medium: { max: 20, operations: ['+', '-', '×'] },
+            medium: { max: 12, operations: ['+', '-', '×'] },
             hard: { max: 50, operations: ['+', '-', '×', '÷'] }
         };
 
@@ -672,3 +675,6 @@
     </script>
 </body>
 </html>
+```
+
+Możesz skopiować cały ten kod i zapisać go jako plik `.html` - będzie działać samodzielnie w przeglądarce!

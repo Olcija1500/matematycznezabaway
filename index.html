@@ -133,6 +133,18 @@
             background-color: #f3f4f6;
         }
 
+        .difficulty-option {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .difficulty-option:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .difficulty-option.selected {
+            background-color: #22c55e;
+        }
+
         .main-content {
             position: relative;
             z-index: 10;
@@ -181,13 +193,146 @@
 
         .game-screen {
             display: none;
+            flex-direction: column;
             width: 100%;
             height: 100%;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            max-width: 800px;
+            margin-bottom: 40px;
+        }
+
+        .game-info {
+            background-color: #2563eb;
+            color: white;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .question-container {
+            background-color: white;
+            padding: 48px 64px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .question {
+            font-size: 64px;
             color: #2563eb;
             font-weight: bold;
+            margin-bottom: 32px;
+        }
+
+        .answers {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .answer-btn {
+            background-color: #2563eb;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            padding: 24px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .answer-btn:hover {
+            background-color: #1d4ed8;
+            transform: scale(1.05);
+        }
+
+        .answer-btn.correct {
+            background-color: #22c55e;
+            animation: correct 0.5s;
+        }
+
+        .answer-btn.wrong {
+            background-color: #ef4444;
+            animation: wrong 0.5s;
+        }
+
+        @keyframes correct {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes wrong {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .game-over {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            position: relative;
+            z-index: 10;
+        }
+
+        .game-over-content {
+            background-color: white;
+            padding: 64px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-over-title {
+            font-size: 56px;
+            color: #2563eb;
+            font-weight: bold;
+            margin-bottom: 24px;
+        }
+
+        .final-score {
+            font-size: 48px;
+            color: #f97316;
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+
+        .restart-btn {
+            background-color: #22c55e;
+            color: white;
+            font-weight: bold;
+            font-size: 28px;
+            padding: 20px 48px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .restart-btn:hover {
+            background-color: #16a34a;
+            transform: scale(1.05);
+        }
+
+        .instructions {
+            color: white;
+            line-height: 1.6;
         }
 
         @media (max-width: 768px) {
@@ -207,26 +352,51 @@
             .math-expression {
                 font-size: 18px;
             }
+
+            .question {
+                font-size: 42px;
+            }
+
+            .answer-btn {
+                font-size: 24px;
+                padding: 16px;
+            }
+
+            .game-info {
+                font-size: 18px;
+                padding: 12px 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div id="game-container">
-        <!-- Niebieska ramka -->
         <div class="border-frame" id="border-frame"></div>
 
-        <!-- Menu boczne -->
         <div class="side-menu" id="side-menu">
             <h2>Menu</h2>
             <div class="menu-options">
-                <button class="menu-option">Instrukcje</button>
-                <button class="menu-option">Poziomy trudności</button>
-                <button class="menu-option">Ustawienia</button>
+                <button class="menu-option" onclick="showInstructions()">Instrukcje</button>
+                <button class="menu-option" onclick="showDifficulty()">Poziomy trudności</button>
                 <button class="menu-option menu-close" onclick="toggleMenu()">Zamknij</button>
+            </div>
+            <div id="instructions-content" style="display: none; margin-top: 20px;">
+                <div class="instructions">
+                    <h3 style="margin-bottom: 12px;">Jak grać?</h3>
+                    <p>1. Wybierz poziom trudności</p>
+                    <p>2. Rozwiąż działania matematyczne</p>
+                    <p>3. Wybierz poprawną odpowiedź</p>
+                    <p>4. Zdobywaj punkty!</p>
+                    <p style="margin-top: 12px;">Masz 60 sekund na 10 pytań!</p>
+                </div>
+            </div>
+            <div id="difficulty-content" style="display: none; margin-top: 20px;">
+                <button class="menu-option difficulty-option" data-level="easy" onclick="setDifficulty('easy')">Łatwy (1-10)</button>
+                <button class="menu-option difficulty-option" data-level="medium" onclick="setDifficulty('medium')">Średni (1-20)</button>
+                <button class="menu-option difficulty-option selected" data-level="hard" onclick="setDifficulty('hard')">Trudny (1-50)</button>
             </div>
         </div>
 
-        <!-- Główna zawartość -->
         <div class="main-content" id="main-content">
             <div class="title-container">
                 <button class="menu-btn" onclick="toggleMenu()">
@@ -241,19 +411,49 @@
             <button class="start-btn" onclick="startGame()">Rozpocznij</button>
         </div>
 
-        <!-- Ekran gry -->
         <div class="game-screen" id="game-screen">
-            Gra zostanie wkrótce uruchomiona...
+            <div class="game-header">
+                <div class="game-info">Punkty: <span id="score">0</span></div>
+                <div class="game-info">Czas: <span id="timer">60</span>s</div>
+            </div>
+            <div class="question-container">
+                <div class="question" id="question">2 + 2 = ?</div>
+            </div>
+            <div class="answers" id="answers"></div>
+        </div>
+
+        <div class="game-over" id="game-over">
+            <div class="game-over-content">
+                <div class="game-over-title">Koniec Gry!</div>
+                <div class="final-score">Twój wynik: <span id="final-score">0</span></div>
+                <button class="restart-btn" onclick="restartGame()">Zagraj ponownie</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // Generowanie losowych działań matematycznych w ramce
+        let score = 0;
+        let timeLeft = 60;
+        let currentQuestion = 0;
+        let totalQuestions = 10;
+        let correctAnswer = 0;
+        let timerInterval;
+        let difficulty = 'hard';
+
+        const difficultySettings = {
+            easy: { max: 10, operations: ['+', '-'] },
+            medium: { max: 20, operations: ['+', '-', '×'] },
+            hard: { max: 50, operations: ['+', '-', '×', '÷'] }
+        };
+
         function generateMathExpressions() {
             const operations = ['+', '-', '×', '÷'];
             const container = document.getElementById('game-container');
+            const existingExpressions = container.querySelectorAll('.math-expression');
+            existingExpressions.forEach(expr => expr.remove());
+            
             const positions = [];
-            const minDistance = 8; // Minimalna odległość między działaniami (w %)
+            const minDistance = 8;
             
             function isTooClose(newTop, newLeft) {
                 for (let i = 0; i < positions.length; i++) {
@@ -278,29 +478,23 @@
                 const num2 = Math.floor(Math.random() * 20) + 1;
                 const op = operations[Math.floor(Math.random() * operations.length)];
                 
-                // Losowa pozycja - głównie na górze, dole, lewo i prawo ramki
                 let top, left;
                 const position = Math.random();
                 
                 if (position < 0.25) {
-                    // Góra - w obrębie górnej ramki (0-80px to 0-8vh)
                     top = Math.random() * 5 + 1.5;
                     left = Math.random() * 80 + 10;
                 } else if (position < 0.5) {
-                    // Dół - w obrębie dolnej ramki
                     top = Math.random() * 5 + 92.5;
                     left = Math.random() * 80 + 10;
                 } else if (position < 0.75) {
-                    // Lewo - w obrębie lewej ramki
                     top = Math.random() * 80 + 10;
                     left = Math.random() * 5 + 1.5;
                 } else {
-                    // Prawo - w obrębie prawej ramki
                     top = Math.random() * 80 + 10;
                     left = Math.random() * 5 + 92.5;
                 }
                 
-                // Sprawdź, czy pozycja nie jest za blisko innych działań
                 if (!isTooClose(top, left)) {
                     positions.push({top: top, left: left});
                     
@@ -320,19 +514,158 @@
             }
         }
 
-        // Toggle menu
         function toggleMenu() {
             const menu = document.getElementById('side-menu');
             menu.classList.toggle('open');
         }
 
-        // Start game
-        function startGame() {
-            document.getElementById('main-content').style.display = 'none';
-            document.getElementById('game-screen').style.display = 'flex';
+        function showInstructions() {
+            document.getElementById('difficulty-content').style.display = 'none';
+            const instructions = document.getElementById('instructions-content');
+            instructions.style.display = instructions.style.display === 'none' ? 'block' : 'none';
         }
 
-        // Inicjalizacja
+        function showDifficulty() {
+            document.getElementById('instructions-content').style.display = 'none';
+            const diffContent = document.getElementById('difficulty-content');
+            diffContent.style.display = diffContent.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function setDifficulty(level) {
+            difficulty = level;
+            document.querySelectorAll('.difficulty-option').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelector(`[data-level="${level}"]`).classList.add('selected');
+        }
+
+        function generateQuestion() {
+            const settings = difficultySettings[difficulty];
+            const operations = settings.operations;
+            const maxNum = settings.max;
+            
+            const num1 = Math.floor(Math.random() * maxNum) + 1;
+            const num2 = Math.floor(Math.random() * maxNum) + 1;
+            const operation = operations[Math.floor(Math.random() * operations.length)];
+            
+            let question, answer;
+            
+            switch(operation) {
+                case '+':
+                    question = `${num1} + ${num2}`;
+                    answer = num1 + num2;
+                    break;
+                case '-':
+                    question = `${Math.max(num1, num2)} - ${Math.min(num1, num2)}`;
+                    answer = Math.max(num1, num2) - Math.min(num1, num2);
+                    break;
+                case '×':
+                    question = `${num1} × ${num2}`;
+                    answer = num1 * num2;
+                    break;
+                case '÷':
+                    const dividend = num1 * num2;
+                    question = `${dividend} ÷ ${num2}`;
+                    answer = num1;
+                    break;
+            }
+            
+            correctAnswer = answer;
+            document.getElementById('question').textContent = question + ' = ?';
+            
+            generateAnswers(answer);
+        }
+
+        function generateAnswers(correct) {
+            const answersContainer = document.getElementById('answers');
+            answersContainer.innerHTML = '';
+            
+            const answers = [correct];
+            while(answers.length < 4) {
+                const offset = Math.floor(Math.random() * 20) - 10;
+                const wrongAnswer = correct + offset;
+                if(wrongAnswer > 0 && !answers.includes(wrongAnswer)) {
+                    answers.push(wrongAnswer);
+                }
+            }
+            
+            answers.sort(() => Math.random() - 0.5);
+            
+            answers.forEach(answer => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = answer;
+                btn.onclick = () => checkAnswer(answer, btn);
+                answersContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, btn) {
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach(b => b.disabled = true);
+            
+            if(selected === correctAnswer) {
+                btn.classList.add('correct');
+                score += 10;
+                document.getElementById('score').textContent = score;
+            } else {
+                btn.classList.add('wrong');
+                buttons.forEach(b => {
+                    if(parseInt(b.textContent) === correctAnswer) {
+                        b.classList.add('correct');
+                    }
+                });
+            }
+            
+            currentQuestion++;
+            
+            setTimeout(() => {
+                if(currentQuestion < totalQuestions && timeLeft > 0) {
+                    generateQuestion();
+                } else {
+                    endGame();
+                }
+            }, 1500);
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = timeLeft;
+                
+                if(timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function startGame() {
+            score = 0;
+            timeLeft = 60;
+            currentQuestion = 0;
+            
+            document.getElementById('score').textContent = score;
+            document.getElementById('timer').textContent = timeLeft;
+            
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+            document.getElementById('game-over').style.display = 'none';
+            
+            generateQuestion();
+            startTimer();
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('game-over').style.display = 'flex';
+            document.getElementById('final-score').textContent = score;
+        }
+
+        function restartGame() {
+            startGame();
+        }
+
         window.onload = function() {
             generateMathExpressions();
         };
